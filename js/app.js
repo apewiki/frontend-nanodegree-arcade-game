@@ -28,6 +28,7 @@ var Enemy = function() {
 };
 
 Enemy.prototype = {
+    //Reset the position and speed of an enemy when it goes out of bound
     reset : function() {
         this.x=0;
         this.y=randomize(1,4)*BLOCK_HEIGHT+Y_OFFSET;
@@ -43,7 +44,6 @@ Enemy.prototype = {
         this.x += dt * this.speed;
         if (this.x >  COLS*BLOCK_WIDTH|| this.x <1){
             this.reset();
-            //console.log(this.x, this.y);
         }
     },
 
@@ -62,13 +62,13 @@ var Player = function(){
 };
 
 Player.prototype = {
+    //Reset the position of the player to starting point
     resetPos : function() {
-        console.log("in resetPos");
-
         this.x=PLAYER_START_X;
         this.y=PLAYER_START_Y;
     },
 
+    //Reset the player object, used when a new game is started
     reset : function() {
         this.resetPos();
         this.lives=3;
@@ -76,40 +76,41 @@ Player.prototype = {
     },
 
 
+    //Check for collision range
     inRange : function(x, y, tolerance) {
         return (Math.abs(x - this.x)< tolerance/2 && Math.abs(y - this.y) < tolerance/2);
 
     },
 
-    checkCollision : function() {
-        
+    //Check if the player collide with an enemy
+    checkCollision : function() {      
         allEnemies.forEach(function(enemy){
-            //console.log(this.x, this.y, enemy.x, enemy.y, this.lives);
             if (this.inRange(enemy.x, enemy.y, COLLISION_TOLERANCE)) {
-                console.log(this.x, this.y, enemy.x, enemy.y, this.lives);
-                this.lives--? this.resetPos() : this.reset();
-                document.getElementById("game_lives").innerHTML="Lives: "+this.lives;
-                if (!this.lives) {
+                this.lives--;
+                document.getElementById("game_lives").innerHTML="Lives: "+this.lives;  
+                //console.log("collision!");
+                //console.log(this.lives, this.x, this.y);
+                if (this.lives) {
+                    this.resetPos();
+                } else {
+                    this.reset(); 
                     resetGame();
-                }           
+                }
             }
         }.bind(this));
     },
 
+    //Check if player is out of bound. Reset its position if out of bound
     checkBounds : function() {
-        if (this.x>BLOCK_WIDTH*(COLS-1) || this.x<0 || this.y<BLOCK_HEIGHT) {
-            console.log("Out of bound!");
-            console.log(this.x, this.y);
+        if (this.x>BLOCK_WIDTH*(COLS-1) || this.x<0 || this.y<BLOCK_HEIGHT + Y_OFFSET || this.y>BLOCK_HEIGHT*(ROWS-1)) {
+            //console.log("out of bound");
+            //console.log(this.x, this.y)
             this.resetPos();
         }
     },
 
-    isAlive : function() {
-        return this.lives>0;
-    },
-
+    //Update player status: collision, lives, treasures collected 
     update:function() {
-        //console.log(this.x, this.y);
         if (game_on) {
             this.checkBounds();
             this.checkCollision();
@@ -117,12 +118,13 @@ Player.prototype = {
         }
     },
 
+    //Check if player successfully collects a gem
     checkTreasure : function() {
         if (this.lives && this.inRange(gem.x, gem.y, GEM_TOLERANCE)) {
-            console.log("Got treasure")
-            console.log(gem.x, gem.y, this.x, this.y)
             this.score++;
-            document.getElementById("game_score").innerHTML = "Score: "+this.score;;
+            document.getElementById("game_score").innerHTML = "Score: "+this.score;
+            //console.log("Got gem");
+            //console.log(gem.x, gem.y, this.x, this.y)
             gem.reset();
         }
     },
@@ -156,7 +158,7 @@ var Gem = function() {
 
 Gem.prototype = {
     reset : function() {
-        this.x = randomize(0,4)*BLOCK_WIDTH;
+        this.x = randomize(1,4)*BLOCK_WIDTH;
         this.y = randomize(1,3)*BLOCK_HEIGHT;
     },
 
@@ -183,8 +185,6 @@ var gem = new Gem();
 
 //global.allEnemies=allEnemies;
 var player = new Player();
-//console.log(player.width());
-//console.log(player.height());
 
 
 // This listens for key presses and sends the keys to your
@@ -201,14 +201,13 @@ document.addEventListener('keyup', function(e) {
     }
 });
 
+//If player's lives are exhausted, the game is over, reset the game
 function resetGame() {
     game_on = false;
 
     var end_game_element=document.getElementById("end_game");
     end_game_element.style.display=null;
     end_game_element.className="game-over-show";
-    console.log("name of css class of end_game");
-    console.log(end_game_element.className);
     var start_btn_element=document.getElementById("start_btn_div");
     start_btn_element.style.display=null;
     start_btn_element.style.display="start";
@@ -217,7 +216,7 @@ function resetGame() {
     start_btn.innerHTML="Start Over";
 }
 
-
+//Click the start button to start the game
 start_btn.onclick=function() {
     start_btn_div.style.display='none';
     end_game.style.display='none';
