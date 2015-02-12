@@ -45,8 +45,10 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
-        render();
+        if (game_on) {
+            update(dt);
+            render();
+        }
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -69,24 +71,6 @@ var Engine = (function(global) {
         main();
     }
 
-    function checkCollisions() {
-        allEnemies.forEach(function(enemy){
-            //if (enemy.x >= player.x-player.width()/2 && enemy.x <= player.x+ player.width()/2 
-            //    && enemy.y >= player.y-player.height()/2 && enemy.y <= player.y+player.height()/2) {
-            //    console.log("collision!");
-            
-            if (enemy.x > player.x-20  && enemy.x<player.x+20 && enemy.y > player.y-20 && enemy.y < player.y+20 ){
-                player.reset();
-                console.log(player.y);
-                console.log(enemy.y);
-                //console.log(enemy.x);
-                //console.log(enemy.y);
-                console.log("collision!");
-                return true;
-            }
-            return false;
-        });
-    }
 
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
@@ -99,12 +83,6 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        if (checkCollisions()) {
-  //          player.reset();
-   //         console.log(player.x);
-   //         console.log(player.y);
-    //        render();
-        }
     }
 
     /* This is called by the update function  and loops through all of the
@@ -180,6 +158,7 @@ var Engine = (function(global) {
         });
 
         player.render();
+        gem.render();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -188,6 +167,8 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+        player.reset();
+        gem.reset();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -199,7 +180,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/BlueGem.png'
     ]);
     Resources.onReady(init);
 

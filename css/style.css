@@ -1,3 +1,38 @@
 body {
     text-align: center;
+    background: grey;
 }
+
+.start {
+	font-weight: bold;
+	background: yellow;
+	margin-right: auto;
+	margin-left: auto;
+	width: 50%;
+	height: 80px;
+}
+
+.score {
+	font-weight: bold;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+}
+
+.lives {
+	font-weight: bold;
+}
+
+.game-over {
+	display: none;
+}
+
+.game-over-show {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	width: 50%;
+	color: red;
+	font-size: 25px;
+}
+
